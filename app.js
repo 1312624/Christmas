@@ -9,6 +9,6 @@ app.use(express.static('views'));
 app.get('/', (req, res) => {
 	res.redirect('index.html');
 })
-server.listen(3000 || process.env.PORT, () => {
+server.listen(process.env.PORT || 3000 , () => {
 	console.log('Server is started!');
 });
