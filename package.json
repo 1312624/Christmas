@@ -1,0 +1,15 @@
+{
+  "name": "chirst-mas-2016",
+  "version": "1.0.0",
+  "description": "A gift for PY",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "HMT",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

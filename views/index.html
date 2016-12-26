@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <title>Test</title>
+    <link href="https://fonts.googleapis.com/css?family=Trirong" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css">
+</head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: 'Trirong Extra-Bold Italic', serif;
+    font-size: 50px;
+}
+
+body {
+    overflow: hidden;
+    background: url(469371.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.bs-example {
+    margin: 20px;
+}
+
+.modal-content {
+	background: black;
+}
+
+.modal-title {
+	color: white;
+}
+
+.modal-content iframe {
+    margin: 0 auto;
+    display: block;
+}
+
+#santaClaus {
+    position: absolute;
+}
+
+canvas {
+    display: block;
+}
+
+#musicBackground {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px !important;
+}
+
+.button {
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: 2px solid white;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    color: red;
+    font-weight: bold;
+    display: none;
+}
+
+.button:hover {
+    color: red;
+}
+</style>
+
+<body>
+    <p id="content" style="position: absolute; left: 30%; top: 10%; color: white; width: 40%; word-wrap: break-word;"></p>
+    <audio id="musicBackground" autoplay="" controls="false" loop="true">
+        <source src="Last-Chirstmas.mp3" type="audio/mpeg"></source>
+        Your browser does not support the audio element.
+    </audio>
+    <canvas id="canvas"></canvas>
+    <img id="santaClaus" />
+    <button class="btn button btntrue" onmouseover="moveWhenHover()" style="position: absolute; left : 42%; top: 45%" ;>Có</button>
+    <button class="btn button btnfalse" onclick="showAnotherContent()" style="position: absolute; left : 52%; top: 45%" ;>Không</button>
+    <div class="bs-example">
+        <!-- Modal HTML -->
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Tặng mập :*</h4>
+                    </div>
+                    <div class="modal-body">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/qRzfVLmoRRA" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+    var demo_input = document.getElementById('demo_input');
+
+    var content = "Giáng sinh vui vẻ, ấm áp, hạnh phúc nha bà mập của anh <3 !!!";
+    var index = 0;
+    var stage = 0;
+    var end = false;
+    var loop = false;
+
+    window.next_letter = function(string, string2, callback) {
+        if (index <= string.length) {
+            value = string.substr(0, index++);
+            $('#content').html(value);
+            setTimeout(`next_letter('${string}','${string2}',null)`, 120);
+        } else {
+            stage++;
+            index = 0;
+            if (stage >= 2) {
+                if (loop === false && end === false) $('.button').css('display', 'block');
+                else if (loop === true && end === false) {
+                    $('#musicBackground')[0].pause();
+                    $('#myModal').modal('show');
+                }
+                return;
+            }
+            setTimeout(`next_letter('${string2}','${string}',null)`, 650);
+        }
+    }
+
+    next_letter(content, "Mập có muốn nhận được quà giáng sinh của anh hông ?", null);
+
+    window.onload = function() {
+        $('#myModal').on('hidden.bs.modal', function(e) {
+            loop = false;
+            stage = 0;
+            end = true;
+            $('#musicBackground')[0].play();
+            next_letter('Quà tới hơi bị trễ mong mập đừng buồn anh nha :)))', "Anh thương em lắm <3!!", null);
+        });
+
+        $('#musicBackground').css({
+                'top': window.innerHeight - 20 + "px"
+            })
+            //canvas init
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        //canvas dimensions
+        var W = window.innerWidth;
+        var H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+
+        //snowflake particles
+        var mp = 25; //max particles
+        var particles = [];
+        for (var i = 0; i < mp; i++) {
+            particles.push({
+                x: Math.random() * W, //x-coordinate
+                y: Math.random() * H, //y-coordinate
+                r: Math.random() * 4 + 1, //radius
+                d: Math.random() * mp //density
+            })
+        }
+
+        //Lets draw the flakes
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.beginPath();
+            for (var i = 0; i < mp; i++) {
+                var p = particles[i];
+                ctx.moveTo(p.x, p.y);
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+            }
+            ctx.fill();
+            update();
+        }
+
+        //Function to move the snowflakes
+        //angle will be an ongoing incremental flag. Sin and Cos functions will be applied to it to create vertical and horizontal movements of the flakes
+        var angle = 0;
+
+        function update() {
+            angle += 0.01;
+            for (var i = 0; i < mp; i++) {
+                var p = particles[i];
+                //Updating X and Y coordinates
+                //We will add 1 to the cos function to prevent negative values which will lead flakes to move upwards
+                //Every particle has its own density which can be used to make the downward movement different for each flake
+                //Lets make it more random by adding in the radius
+                p.y += Math.cos(angle + p.d) + 1 + p.r / 2;
+                p.x += Math.sin(angle) * 2;
+
+                //Sending flakes back from the top when it exits
+                //Lets make it a bit more organic and let flakes enter from the left and right also.
+                if (p.x > W + 5 || p.x < -5 || p.y > H) {
+                    if (i % 3 > 0) //66.67% of the flakes
+                    {
+                        particles[i] = {
+                            x: Math.random() * W,
+                            y: -10,
+                            r: p.r,
+                            d: p.d
+                        };
+                    } else {
+                        //If the flake is exitting from the right
+                        if (Math.sin(angle) > 0) {
+                            //Enter from the left
+                            particles[i] = {
+                                x: -5,
+                                y: Math.random() * H,
+                                r: p.r,
+                                d: p.d
+                            };
+                        } else {
+                            //Enter from the right
+                            particles[i] = {
+                                x: W + 5,
+                                y: Math.random() * H,
+                                r: p.r,
+                                d: p.d
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        //animation loop
+        setInterval(draw, 33);
+    }
+
+    var leftToRight = true;
+    var size = 0;
+    var endPos = 0;
+
+    function showSantaClaus() {
+        if (leftToRight === true) {
+            leftToRight = false;
+            endPos = $(window).width();
+            $("img#santaClaus").attr("src", "santaclaus.gif");
+            $("img#santaClaus").css("left", "-390px");
+        } else {
+            leftToRight = true;
+            endPos = -390;
+            $("img#santaClaus").attr("src", "santaclausreverse.gif");
+            $("img#santaClaus").css("left", $(window).width() + "px");
+        }
+        $("img#santaClaus").css("height", "90px");
+        $("img#santaClaus").css("width", "260px");
+        $("img#santaClaus").css("top", "0");
+
+        $("img#santaClaus").animate({
+            "left": endPos
+        }, 15000, "linear", showSantaClaus);
+    }
+
+    $(document).ready(function() {
+        showSantaClaus();
+    });
+
+    var i = 0;
+
+    function moveWhenHover() {
+        $(".btntrue").fadeOut(150, function() {
+            var posX = (Math.random() * (900 - $('.btntrue').width())).toFixed();
+            var posY = (Math.random() * (500 - $('.btntrue').height()) - 20).toFixed();
+            if (posY <= 30) posY = 30;
+            $('.btntrue').fadeIn(200);
+            $('.btntrue').css({
+                'position': 'absolute',
+                'left': posX + 'px',
+                'top': posY + 'px'
+            });
+        });
+    }
+
+    function showAnotherContent() {
+        loop = true;
+        $('.button').css('display', 'none');
+        index = 0;
+        stage = 0;
+        next_letter('Mập không muốn anh tặng quà vậy thôi nha mập :)))', 'Anh đùa đó, quà của mập nè <3', () => {});
+    }
+
+    $('.wishView').keydown(false);
+
+    function updateWish(e) {
+        if (e.keyCode === 8) {
+            alert('Đừng có cố xoá <3!!');
+            return;
+        }
+        var text = "Hoàng Minh Trí đẹp trai ku te lạc lối";
+        var length = text.length;
+
+        if (i <= length - 1) {
+            var temp = $('.wishView').val();
+            $('.wishView').val("");
+            $('.wishView').val(temp + text[i]);
+            i++;
+        } else return;
+    }
+    </script>
+</body>
+
+</html>
